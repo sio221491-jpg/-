@@ -1,8 +1,19 @@
 import { TabType } from '../models/Index';
+import Recommend from '../views/Recommend';
+import Find from '../views/Find';
+import Moment from '../views/Moment';
+import Mine from '../views/Mine';
+import { SAFE_TOP, SAFE_BOTTOM } from '../constants';
+
+
+
 @Entry
 @Component
 struct Index {
   @State isActive: string = 'recommend';
+  @StorageProp(SAFE_TOP) safeTop: number = 0;
+  @StorageProp(SAFE_BOTTOM) safeBottom: number = 0;
+
 
   tabData: TabType[] = [
     { icon: $r('app.media.ic_recommend'), text: '推荐', name: 'recommend' },
@@ -23,17 +34,32 @@ struct Index {
     }
   }
 
+  aboutToAppear() {
+    //模拟获取安全区数值
+    console.log('safeTop=', this.safeTop);
+  }
+
   build() {
     Tabs({ barPosition: BarPosition.End }) {
       ForEach(this.tabData, (item: TabType) => {
         TabContent() {
-          Text(item.text + '内容')
+          if (item.name == 'recommend') {
+            Recommend()
+          } else if (item.name == 'find') {
+            Find()
+          } else if (item.name == 'moment') {
+            Moment()
+          } else if (item.name == 'mine') {
+            Mine()
+          }
         }
         .backgroundColor('#131215')
         .tabBar(this.tabBarBuilder(item))
+        .padding({ top: this.safeTop })
       })
     }
     .backgroundColor('#3b3f42')
+    .padding({ bottom: this.safeBottom })
     .onChange((index: number) => {
       this.isActive = this.tabData[index].name;
     })
