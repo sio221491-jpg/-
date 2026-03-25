@@ -1,4 +1,4 @@
-import { TabType } from '../models/Index';
+import { TabType } from '../models/index';
 import Recommend from '../views/Recommend';
 import Find from '../views/Find';
 import Moment from '../views/Moment';
