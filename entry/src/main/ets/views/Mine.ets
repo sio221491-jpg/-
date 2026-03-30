@@ -15,10 +15,17 @@ export default struct Mine {
     Column() {
       // 背景
       Column() {
-        GridRow({ gutter: 8 }) {
+        // 网格布局
+        GridRow({
+          // 关键1：设置断点与列数
+          // breakpoints: { value: ['100vp'] }, // 仅1个断点，保证所有屏幕都是4列
+          columns: 4, // 总列数固定为4
+          gutter: { x: 2, y: 2 }            // 项之间的横向/纵向间距
+        }) {
+          // 遍历每列生成网格项
           ForEach(this.columnList, (item: number) => {
-            GridCol({ span: 3 }) {
-              SongCard({ songs: this.showList[item] })
+            GridCol({ span: 1 }) { // 每个项占1列
+              SongCard({ songs: this.showList[item] }) // 传递当前列的歌曲数据
             }
           })
         }
