@@ -1,8 +1,10 @@
 import { getSongList } from '../apis';
 import { SongItemType } from '../models';
+import AVPlayerManager from '../utils/AVPlayerManager';
 @Component
 export default struct Find {
   @State songs: SongItemType[] = [];
+  router = this.getUIContext().getRouter();
   async aboutToAppear() {
     this.songs = await getSongList() as SongItemType[];
   }
@@ -46,6 +48,11 @@ export default struct Find {
             }
             .width('100%')
             .margin({ bottom: 10 })
+            .onClick(() => {
+              // 播放当前点击的歌曲
+              AVPlayerManager.singPlay(item); //
+              this.router.pushUrl({ url: 'pages/Play' });
+            })
           }
         })
       }
