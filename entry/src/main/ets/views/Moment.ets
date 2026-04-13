@@ -1,8 +1,10 @@
 import { getMomentList } from '../apis';
 import { MomentListType } from '../models';
+import AVPlayerManager from '../utils/AVPlayerManager';
 @Component
 export default struct Moment {
   @State momentList: MomentListType[] = [];
+  router = this.getUIContext().getRouter();
   async aboutToAppear() {
     this.momentList = await getMomentList() as MomentListType[];
   }
@@ -49,6 +51,11 @@ export default struct Moment {
                   .justifyContent(FlexAlign.SpaceBetween)
                   .padding(12)
                   Image($r('app.media.ic_single_play'))
+                    .onClick(() => {
+                      // 播放当前点击的歌曲
+                      AVPlayerManager.singPlay(item.song); //
+                      this.router.pushUrl({ url: 'pages/Play' });
+                    })
                     .width(20)
                     .fillColor('#ececec')
                     .margin({ right: 12 })

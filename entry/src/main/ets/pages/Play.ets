@@ -1,9 +1,36 @@
 import { SongItem, PlayState } from '../models';
+import { SONG_KEY } from '../constants';
+import AVPlayerManager from '../utils/AVPlayerManager';
 @Entry
 @Component
 struct Play {
   @State panelHeight: string = '0%';
+  @StorageLink(SONG_KEY) // changed from @State
+  @Watch('changeAnimate')
   playState: PlayState = new PlayState();
+
+  number2time(number: number) {
+    // 判断是否大于1分钟
+    if (number >= 60 * 1000) {
+      const s = Math.ceil(number / 1000 % 60);
+      const m = Math.floor(number / 1000 / 60);
+      const second = s.toString().padStart(2, '0');
+      const minute = m.toString().padStart(2, '0');
+      return minute + ':' + second;
+    } else {
+      const s = Math.ceil(number / 1000 % 60);
+      const second = s.toString().padStart(2, '0');
+      return '00:' + second;
+    }
+  }
+
+  changeAnimate() {
+    if (this.playState.isPlay) {
+      this.animatorResult.play();
+    } else {
+      this.animatorResult.pause();
+    }
+  }
 
   @State rotateAngle: number = 0;
   animatorResult = this.getUIContext().createAnimator({
@@ -113,18 +140,21 @@ struct Play {
               // 播放位置区域
               Row({ space: 4 }) {
                 // 播放时间
-                Text('00:00')
+                Text(this.number2time(this.playState.time))
                   .fontSize(12)
                   .fontColor(Color.White)
                 // 进度条
                 Slider({ value: this.playState.time, min: 0, max: this.playState.duration })
+                  .onChange(value => {
+                    AVPlayerManager.player.seek(value);
+                  }) //新增
                   .layoutWeight(1)
                   .blockColor(Color.White)
                   .selectedColor(Color.White)
                   .trackColor('#ccc5c5c5')
                   .trackThickness(2)
                 // 歌曲时长
-                Text('00:00')
+                Text(this.number2time(this.playState.duration))
                   .fontSize(12)
                   .fontColor(Color.White)
               }
@@ -166,6 +196,13 @@ struct Play {
                 Image(this.playState.isPlay ? $r('app.media.ic_paused') : $r('app.media.ic_play'))
                   .fillColor(Color.White)
                   .width(50)
+                  .onClick(() => {
+                    if (this.playState.isPlay) {
+                      AVPlayerManager.pause();
+                    } else {
+                      AVPlayerManager.singPlay(this.playState.playList[this.playState.playIndex]);
+                    }
+                  })
                 // “下一首”按钮
                 Image($r('app.media.ic_next'))
                   .fillColor(Color.White)
